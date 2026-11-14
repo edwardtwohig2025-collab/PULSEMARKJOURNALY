@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Pulsemark — Personal Blood Pressure Journal</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f7fb;
+  color: #172033;
+}
+
+.app {
+  max-width: 900px;
+  margin: auto;
+  padding: 25px 18px 50px;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #315bea;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-size: 23px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 23px;
+}
+
+.subtitle {
+  color: #697386;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #e4e8f0;
+  border-radius: 20px;
+  padding: 22px;
+  margin-bottom: 18px;
+  box-shadow: 0 10px 30px rgba(20,40,70,.07);
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #4e586c;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #e1e6ef;
+  border-radius: 12px;
+  font-size: 16px;
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #315bea;
+}
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+button {
+  border: 0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.save-button {
+  width: 100%;
+  margin-top: 16px;
+  background: #315bea;
+  color: white;
+  font-size: 15px;
+}
+
+.save-button:hover {
+  background: #2447c7;
+}
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.stat {
+  background: #f7f9fd;
+  border: 1px solid #e4e8f0;
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.stat-title {
+  color: #697386;
+  font-size: 11px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+.entry {
+  border: 1px solid #e4e8f0;
+  border-radius: 15px;
+  padding: 16px;
+  margin-top: 12px;
+}
+
+.entry-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.reading {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.reading span {
+  font-size: 12px;
+  color: #697386;
+}
+
+.entry-date {
+  color: #697386;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.pulse {
+  color: #697386;
+  font-size: 13px;
+}
+
+.category {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 5px 9px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.normal {
+  background: #e8f7f0;
+  color: #126b4b;
+}
+
+.elevated {
+  background: #fff5d6;
+  color: #8a6100;
+}
+
+.high {
+  background: #ffe8ec;
+  color: #a82738;
+}
+
+.note {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e4e8f0;
+  color: #4f596b;
+  font-size: 13px;
+}
+
+.delete-button {
+  margin-top: 14px;
+  padding: 8px 13px;
+  background: #fff0f2;
+  color: #d9364f;
+  font-size: 12px;
+}
+
+.delete-button:hover {
+  background: #ffe1e6;
+}
+
+.empty {
+  text-align: center;
+  padding: 30px;
+  color: #697386;
+}
+
+.footer {
+  text-align: center;
+  color: #8790a2;
+  font-size: 11px;
+  line-height: 1.5;
+  margin-top: 25px;
+}
+
+@media (max-width: 650px) {
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .full {
+    grid-column: auto;
+  }
+
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  .entry-top {
+    flex-direction: column;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+
+  <div class="brand">
+
+    <div class="logo">
+      ♥
+    </div>
+
+    <div>
+      <h1>Pulsemark</h1>
+
+      <div class="subtitle">
+        Personal Blood Pressure Journal
+      </div>
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- ADD READING -->
+
+<section class="card">
+
+<h2>Add Blood Pressure Reading</h2>
+
+<div class="subtitle">
+Record a reading from your blood-pressure monitor.
+</div>
+
+
+<div class="form-grid">
+
+<div>
+<label>SYSTOLIC</label>
+
+<input
+id="systolic"
+type="number"
+placeholder="120">
+</div>
+
+
+<div>
+<label>DIASTOLIC</label>
+
+<input
+id="diastolic"
+type="number"
+placeholder="80">
+</div>
+
+
+<div>
+<label>PULSE</label>
+
+<input
+id="pulse"
+type="number"
+placeholder="70">
+</div>
+
+
+<div>
+<label>DATE</label>
+
+<input
+id="date"
+type="date">
+</div>
+
+
+<div>
+<label>TIME</label>
+
+<input
+id="time"
+type="time">
+</div>
+
+
+<div>
+<label>POSITION</label>
+
+<select id="position">
+
+<option>Seated</option>
+<option>Standing</option>
+<option>Lying down</option>
+
+</select>
+
+</div>
+
+
+<div class="full">
+
+<label>NOTES</label>
+
+<textarea
+id="notes"
+placeholder="Optional notes..."></textarea>
+
+</div>
+
+</div>
+
+
+<button
+class="save-button"
+onclick="addReading()">
+
++ Save Reading
+
+</button>
+
+</section>
+
+
+<!-- SUMMARY -->
+
+<section class="card">
+
+<h2>Overview</h2>
+
+<div class="summary">
+
+<div class="stat">
+
+<div class="stat-title">
+TOTAL READINGS
+</div>
+
+<div
+class="stat-value"
+id="total">
+0
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-title">
+LATEST
+</div>
+
+<div
+class="stat-value"
+id="latest">
+—
+</div>
+
+</div>
+
+
+<div class="stat">
+
+<div class="stat-title">
+AVERAGE
+</div>
+
+<div
+class="stat-value"
+id="average">
+—
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<!-- JOURNAL -->
+
+<section class="card">
+
+<h2>Journal</h2>
+
+<div id="entries"></div>
+
+</section>
+
+
+<div class="footer">
+
+Pulsemark is a personal record-keeping tool.
+It does not measure blood pressure and is not a medical device.
+
+</div>
+
+</div>
+
+
+<script>
+
+const STORAGE_KEY =
+"pulsemark_readings";
+
+
+function getReadings() {
+
+return JSON.parse(
+localStorage.getItem(STORAGE_KEY)
+|| "[]"
+);
+
+}
+
+
+function saveReadings(readings) {
+
+localStorage.setItem(
+STORAGE_KEY,
+JSON.stringify(readings)
+);
+
+}
+
+
+function addReading() {
+
+const systolic =
+Number(
+document.getElementById("systolic").value
+);
+
+const diastolic =
+Number(
+document.getElementById("diastolic").value
+);
+
+const pulse =
+Number(
+document.getElementById("pulse").value
+);
+
+const date =
+document.getElementById("date").value;
+
+const time =
+document.getElementById("time").value;
+
+const position =
+document.getElementById("position").value;
+
+const notes =
+document.getElementById("notes").value;
+
+
+if (!systolic || !diastolic) {
+
+alert(
+"Please enter systolic and diastolic values."
+);
+
+return;
+
+}
+
+
+const reading = {
+
+id: Date.now(),
+
+systolic: systolic,
+
+diastolic: diastolic,
+
+pulse: pulse,
+
+date: date,
+
+time: time,
+
+position: position,
+
+notes: notes
+
+};
+
+
+const readings =
+getReadings();
+
+
+readings.unshift(reading);
+
+
+saveReadings(readings);
+
+
+document.getElementById("systolic").value = "";
+document.getElementById("diastolic").value = "";
+document.getElementById("pulse").value = "";
+document.getElementById("notes").value = "";
+
+
+render();
+
+}
+
+
+function deleteReading(id) {
+
+const answer =
+confirm(
+"Delete this journal entry?"
+);
+
+
+if (!answer) {
+return;
+}
+
+
+let readings =
+getReadings();
+
+
+readings =
+readings.filter(
+reading => reading.id !== id
+);
+
+
+saveReadings(readings);
+
+
+render();
+
+}
+
+
+function getCategory(systolic, diastolic) {
+
+if (
+systolic < 120 &&
+diastolic < 80
+) {
+
+return {
+name: "Normal",
+className: "normal"
+};
+
+}
+
+
+if (
+systolic < 130 &&
+diastolic < 80
+) {
+
+return {
+name: "Elevated",
+className: "elevated"
+};
+
+}
+
+
+return {
+name: "High",
+className: "high"
+};
+
+}
+
+
+function render() {
+
+const readings =
+getReadings();
+
+
+document.getElementById("total")
+.textContent =
+readings.length;
+
+
+if (readings.length === 0) {
+
+document.getElementById("latest")
+.textContent = "—";
+
+document.getElementById("average")
+.textContent = "—";
+
+document.getElementById("entries")
+.innerHTML = `
+<div class="empty">
+No readings yet.<br>
+Add your first blood-pressure reading above.
+</div>
+`;
+
+return;
+
+}
+
+
+const latest =
+readings[0];
+
+
+document.getElementById("latest")
+.textContent =
+latest.systolic +
+"/" +
+latest.diastolic;
+
+
+let systolicTotal = 0;
+let diastolicTotal = 0;
+
+
+readings.forEach(r => {
+
+systolicTotal += r.systolic;
+diastolicTotal += r.diastolic;
+
+});
+
+
+const averageSystolic =
+Math.round(
+systolicTotal / readings.length
+);
+
+
+const averageDiastolic =
+Math.round(
+diastolicTotal / readings.length
+);
+
+
+document.getElementById("average")
+.textContent =
+averageSystolic +
+"/" +
+averageDiastolic;
+
+
+document.getElementById("entries")
+.innerHTML =
+readings
+.map(createEntry)
+.join("");
+
+}
+
+
+function createEntry(r) {
+
+const category =
+getCategory(
+r.systolic,
+r.diastolic
+);
+
+
+const pulse =
+r.pulse
+? `Pulse ${r.pulse} bpm`
+: "";
+
+
+const note =
+r.notes
+? `
+<div class="note">
+${escapeHTML(r.notes)}
+</div>
+`
+: "";
+
+
+return `
+
+<div class="entry">
+
+<div class="entry-top">
+
+<div>
+
+<div class="reading">
+
+${r.systolic}/${r.diastolic}
+
+<span>mmHg</span>
+
+</div>
+
+
+<div class="entry-date">
+
+${r.date || ""}
+
+${r.time ? " • " + r.time : ""}
+
+${r.position
+? " • " + r.position
+: ""}
+
+</div>
+
+</div>
+
+
+<div class="pulse">
+
+${pulse}
+
+</div>
+
+</div>
+
+
+<span class="category ${category.className}">
+
+${category.name}
+
+</span>
+
+
+${note}
+
+
+<button
+class="delete-button"
+onclick="deleteReading(${r.id})">
+
+Delete
+
+</button>
+
+
+</div>
+
+`;
+
+}
+
+
+function escapeHTML(text) {
+
+return String(text)
+
+.replaceAll("&", "&amp;")
+.replaceAll("<", "&lt;")
+.replaceAll(">", "&gt;")
+.replaceAll('"', "&quot;")
+.replaceAll("'", "&#039;");
+
+}
+
+
+document.getElementById("date")
+.value =
+new Date()
+.toISOString()
+.split("T")[0];
+
+
+document.getElementById("time")
+.value =
+new Date()
+.toTimeString()
+.substring(0,5);
+
+
+render();
+
+</script>
+
+</body>
+</html>
